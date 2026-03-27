@@ -50,8 +50,9 @@ int pick_next_batsman() {
 }
 
 void check_target() {
-    if (current_innings == 1 && global_score >= target_score) {
-        printf("\n>>> TARGET CHASED DOWN! PAKISTAN WINS! <<<\n");
+    // Only check target in second innings (chasing team) and only if target_score is valid
+    if (is_second_innings && target_score > 0 && global_score >= target_score) {
+        printf("\n>>> TARGET CHASED DOWN! %s WINS! <<<\n", (current_innings == 0) ? "INDIA" : "PAKISTAN");
         match_over = true;
         pthread_cond_broadcast(&next_ball_cond);
         pthread_cond_broadcast(&ball_bowled_cond);
@@ -76,6 +77,7 @@ void reset_innings_state() {
 
     striker_id = 1;
     non_striker_id = 2;
+    next_batsman_id = 3;  // RESET THIS - was missing!
     active_bowler_id = 1;
 }
 
@@ -91,7 +93,7 @@ void play_innings() {
     }
 
     if (use_sjf_scheduling) {
-        int sjf_order[] = {0, 1, 2, 11, 9, 10, 8, 3, 4, 5, 6, 7}; 
+        int sjf_order[] = {0, 1, 2, 8, 9, 10, 11, 3, 4, 5, 6, 7}; 
         for(int i=1; i<=11; i++) spawn_order[i] = sjf_order[i];
     } else {
         int fcfs_order[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; 
