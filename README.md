@@ -62,10 +62,6 @@ make
 - [x] Gantt chart generation
 - [x] Wait time analysis logic
 
-## Known Limitations
-- There is no explicit deadlock detection code; semi-infinite runout logic is handled via lock ordering and `run_out_in_progress` flag but not full deadlock recovery.
-- The simulation uses random probabilities for runs/wickets; results are non-deterministic.
-
 ## Enhancement Suggestions
 - Separate Gantt for legal balls only (if charting by over rather than delivery count).
 - Add CSV / JSON export for analytics.
