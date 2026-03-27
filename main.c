@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
     int first_innings_team = batting_team;
     int second_innings_team = 1 - batting_team;
     
+    is_second_innings = false;  // First innings is NOT a chase
     reset_innings_state();
     current_innings = first_innings_team;
     play_innings();
@@ -43,6 +44,7 @@ int main(int argc, char *argv[]) {
     printf("             STARTING 2ND INNINGS: %s CHASE BEGINS                        \n", second_team_name);
     printf("================================================================================\n\n");
     
+    is_second_innings = true;  // NOW we're in the chasing innings
     reset_innings_state();
     current_innings = second_innings_team;
     play_innings();
