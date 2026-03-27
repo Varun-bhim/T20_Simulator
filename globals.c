@@ -24,6 +24,11 @@ int team_wickets[2] = {0};
 int team_balls[2] = {0};
 int innings_total_deliveries[2] = {0};  // Track total deliveries per innings
 
+// Toss variables
+int toss_winner = -1;  // 0 = India, 1 = Pakistan
+int toss_choice = -1;  // 0 = Bat, 1 = Bowl
+int batting_team = 0;  // 0 = India bats first, 1 = Pakistan bats first
+
 int global_score = 0;
 int total_balls_bowled = 0;       // Only legal balls
 int total_deliveries = 0;         // All deliveries (legal + wides + no-balls)
