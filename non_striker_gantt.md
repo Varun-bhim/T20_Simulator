@@ -24,25 +24,25 @@ gantt
     axisFormat %d
 
     section Innings 1 (India)
-    Y. Pathan : 1, 1
-    G. Gambhir : 2, 1
-    Y. Pathan : 3, 4
-    R. Uthappa : 7, 1
-    Y. Pathan : 8, 2
-    R. Uthappa : 10, 4
-    Y. Pathan : 14, 5
-    R. Uthappa : 19, 4
-    Y. Pathan : 23, 2
-    R. Uthappa : 25, 2
-    Y. Pathan : 27, 2
-    R. Uthappa : 29, 4
-    Y. Pathan : 33, 2
-    R. Uthappa : 35, 1
-    Y. Pathan : 36, 2
-    R. Uthappa : 38, 2
-    Y. Pathan : 40, 1
-    R. Uthappa : 41, 4
-    Yuvraj Singh : 45, 4
+    Y. Pathan : 1, 2
+    G. Gambhir : 2, 3
+    Y. Pathan : 3, 7
+    R. Uthappa : 7, 8
+    Y. Pathan : 8, 10
+    R. Uthappa : 10, 14
+    Y. Pathan : 14, 19
+    R. Uthappa : 19, 23
+    Y. Pathan : 23, 25
+    R. Uthappa : 25, 27
+    Y. Pathan : 27, 29
+    R. Uthappa : 29, 33
+    Y. Pathan : 33, 35
+    R. Uthappa : 35, 36
+    Y. Pathan : 36, 38
+    R. Uthappa : 38, 40
+    Y. Pathan : 40, 41
+    R. Uthappa : 41, 45
+    Yuvraj Singh : 45, 49
     R. Uthappa : 49, 2
     Yuvraj Singh : 51, 2
     R. Uthappa : 53, 1
