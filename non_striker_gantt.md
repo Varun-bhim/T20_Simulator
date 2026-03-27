@@ -1,180 +1,151 @@
-# 🏏 T20 Cricket Simulator - Match Analysis Charts
+# 🏏 Non-Striker Batsman Timeline - 2007 T20 World Cup Final
 
-## 2007 ICC T20 World Cup Final: India vs Pakistan
-
-**Simulation Generated**: Multi-threaded C program using OS scheduling concepts  
-**Match Format**: 20 overs per side | **Venue**: Johannesburg, South Africa | **Date**: September 24, 2007
+**India vs Pakistan**
 
 ---
 
-## 📊 Available Visualizations
+## 📊 Chart Overview
 
-### 1. **[Striker Batsman Timeline](striker_gantt.md)** 🏟️
-Track which batsman was actively **facing the ball** from the bowler
+This Gantt chart visualizes which batsman was positioned at the **non-striker's end** (awaiting their turn) during each delivery of the match.
 
-- Shows the striker at the crease per delivery
-- Indicates who was in control/attacking position
-- Reveals batting dominance patterns
-- **Focus**: Aggressive batting phase tracking
-
-**Quick Access**: [View Striker Chart →](striker_gantt.md)
+- **X-axis**: Delivery number (1-120 legal balls per innings, plus wides/no-balls)
+- **Y-axis**: Player names organized by innings
+- **Bar length**: Duration at non-striker position (in deliveries)
+- **Sections**: Innings 1 (India batting) and Innings 2 (Pakistan batting)
 
 ---
 
-### 2. **[Non-Striker Batsman Timeline](non_striker_gantt.md)** 🤝
-Visualize which batsman was **standing at the other end**, waiting for their turn
+## 📈 Timeline Visualization
 
-- Shows all batsmen rotations and partnerships
-- Reveals sustained partnerships and quick singles
-- Tracks player availability and participation
-- **Focus**: Partnership stability & distribution
+```mermaid
+gantt
+    title Non-Striker Batsman at Crease (Delivery Ranges - Including Wides/No-balls)
+    dateFormat X
+    axisFormat %d
 
-**Key Insight**: Longer bars = more stable partnerships  
-**Quick Access**: [View Non-Striker Chart →](non_striker_gantt.md)
-
----
-
-### 3. **[Bowler Rotation & Spell Analysis](bowler_gantt.md)** 🎯
-Understand the **bowling strategy** - which bowlers bowled when and for how long
-
-- Shows each bowler's spells throughout the innings
-- Reveals tactical rotations and death-over strategies
-- Tracks workload distribution among 5 bowlers
-- **Focus**: Bowling strategy & team tactics
-
-**Key Insight**: Spell changes indicate strategic decisions  
-**Quick Access**: [View Bowler Chart →](bowler_gantt.md)
-
----
-
-## 🎯 How to Use These Charts
-
-### Reading the Timeline Format
-
+    section Innings 1 (India)
+    Y. Pathan : 1, 1
+    G. Gambhir : 2, 1
+    Y. Pathan : 3, 4
+    R. Uthappa : 7, 1
+    Y. Pathan : 8, 2
+    R. Uthappa : 10, 4
+    Y. Pathan : 14, 5
+    R. Uthappa : 19, 4
+    Y. Pathan : 23, 2
+    R. Uthappa : 25, 2
+    Y. Pathan : 27, 2
+    R. Uthappa : 29, 4
+    Y. Pathan : 33, 2
+    R. Uthappa : 35, 1
+    Y. Pathan : 36, 2
+    R. Uthappa : 38, 2
+    Y. Pathan : 40, 1
+    R. Uthappa : 41, 4
+    Yuvraj Singh : 45, 4
+    R. Uthappa : 49, 2
+    Yuvraj Singh : 51, 2
+    R. Uthappa : 53, 1
+    Yuvraj Singh : 54, 4
+    R. Uthappa : 58, 3
+    Yuvraj Singh : 61, 4
+    R. Uthappa : 65, 2
+    Yuvraj Singh : 67, 1
+    R. Uthappa : 68, 5
+    Yuvraj Singh : 73, 8
+    R. Uthappa : 81, 2
+    MS Dhoni : 83, 2
+    R. Uthappa : 85, 4
+    MS Dhoni : 89, 2
+    R. Sharma : 91, 1
+    MS Dhoni : 92, 3
+    R. Sharma : 95, 2
+    MS Dhoni : 97, 1
+    R. Sharma : 98, 2
+    MS Dhoni : 100, 3
+    R. Sharma : 103, 14
+    MS Dhoni : 117, 5
+    R. Sharma : 122, 1
+    RP Singh : 123, 2
+    R. Sharma : 125, 1
+    RP Singh : 126, 3
+    
+    section Innings 2 (Pakistan)
+    I. Nazir : 1, 7
+    M. Hafeez : 8, 2
+    I. Nazir : 10, 4
+    M. Hafeez : 14, 3
+    K. Akmal : 17, 3
+    M. Hafeez : 20, 1
+    K. Akmal : 21, 4
+    M. Hafeez : 25, 8
+    Younis Khan : 33, 2
+    M. Hafeez : 35, 1
+    Younis Khan : 36, 2
+    M. Hafeez : 38, 1
+    Younis Khan : 39, 2
+    M. Hafeez : 41, 3
+    Younis Khan : 44, 3
+    M. Hafeez : 47, 1
+    Younis Khan : 48, 1
+    M. Hafeez : 49, 6
+    Younis Khan : 55, 2
+    M. Hafeez : 57, 8
+    Younis Khan : 65, 4
+    S. Malik : 69, 2
+    Younis Khan : 71, 1
+    S. Malik : 72, 2
+    Younis Khan : 74, 4
+    S. Malik : 78, 2
+    Younis Khan : 80, 6
+    S. Malik : 86, 3
+    Younis Khan : 89, 1
+    S. Malik : 90, 2
+    Younis Khan : 92, 4
+    S. Malik : 96, 1
+    Younis Khan : 97, 5
+    S. Malik : 102, 2
+    Misbah-ul-Haq : 104, 12
+    S. Malik : 116, 1
+    Misbah-ul-Haq : 117, 1
 ```
-Delivery Number: 1 ——— 30 ——— 60 ——— 90 ——— 120+
-                 ↑           ↑             ↑
-              Over 1      Over 5        Over 20
-              (Overs vary with wides/no-balls)
-```
-
-### Key Data Points
-
-| Chart | Shows | Best For |
-|-------|-------|----------|
-| **Striker** | Active batsmen at crease | Identifying aggressive phases |
-| **Non-Striker** | Waiting batsmen | Understanding partnerships & rotations |
-| **Bowler** | Bowling spells | Analyzing tactical strategies |
 
 ---
 
-## 📈 Match Structure Breakdown
+## 🎯 How to Read This Chart
 
-### T20 Cricket Basics
-- **Per Innings**: 20 overs = 120 legal deliveries (+ extras)
-- **Bowling teams**: 5 specialist bowlers
-- **Batting side**: 11 players (1-2 on crease, rest in pavilion)
-- **Over structure**: 6 deliveries = 1 over (bowler changes after each over)
-
-### Delivery Count vs Over Count
-- **120 legal balls** = 20 overs (standard)
-- **Wides & no-balls** = count as deliveries but NOT as overs
-- **Total deliveries** shown in charts = legal balls + extras
+| Element | Meaning |
+|---------|---------|
+| **Horizontal bar** | Time span player is at non-striker end |
+| **Bar length** | Number of deliveries faced from non-striker position |
+| **New row entry** | Batsman rotates to/from striker position |
+| **Section break** | Innings transition (different batting team) |
 
 ---
 
-## 🔍 Analysis Patterns to Spot
+## 📊 Match Statistics
 
-### From Striker Chart
-- ✅ **Confident batting**: Few rotations, longer strike time
-- ✅ **Aggressive phase**: Frequent boundary hits (implied by quick delivery progression)
-- ⚠️ **Pressure from bowlers**: More defensive, slower score progression
+### Innings 1 (India Batting)
+- **Opening pair**: G. Gambhir & Y. Pathan
+- **Batting sequence**: 8 players took strike
+- **Total deliveries faced**: 129 (120 legal + 9 extras)
 
-### From Non-Striker Chart
-- ✅ **Stable opening partnership**: Long bars at top of chart
-- ✅ **Aggressive batsman support**: Frequent changes indicate good runners
-- ⚠️ **Collapse phase**: Rapid changes indicate quick wickets
-
-### From Bowler Chart
-- ✅ **Balanced attack**: All bowlers have similar spell counts
-- ✅ **Death-over strategy**: Specialist bowlers in overs 17-20
-- ⚠️ **Workload issue**: One bowler overburdened with multiple long spells
+### Innings 2 (Pakistan Batting)
+- **Opening pair**: M. Hafeez & I. Nazir
+- **Batting sequence**: 7 players took strike
+- **Total deliveries faced**: Variable based on match situation
 
 ---
 
-## 💡 Simulation Features
+## 💡 Key Observations
 
-### Scheduling Modes
-**FCFS (First-Come-First-Served)**
-```bash
-./t20_simulator
-```
-- Normal batting order with death-over specialist priority in last 6 balls
-- Reflects traditional cricket strategy
-
-**SJF (Shortest-Job-First)**
-```bash
-./t20_simulator sjf
-```
-- Tail-enders receive priority for batting opportunities
-- Demonstrates alternative tactical approach
-- Shows impact of non-traditional batting order
-
-### Data Tracking
-- **OS Clock**: System ticks tracking delivery sequence
-- **Thread Synchronization**: Real-time batsman/bowler coordination
-- **Extras Handling**: Wides & no-balls properly counted in timeline
-- **Match State**: Dynamic toss, innings tracking, target calculation
+- **Partnership duration**: Longer bars indicate stable partnerships
+- **Frequent rotations**: Indicates quick singles and aggressive batting
+- **Batsman availability**: Shows who faced most deliveries from standing position
+- **Strategic changes**: Visible breaks indicate mid-innings disruptions (wickets, injuries)
 
 ---
 
-## 🏆 How to Interpret Results
-
-### Winning Strategy
-Look for:
-1. **Striker chart**: Extended periods of dominance
-2. **Non-striker chart**: Stable partnerships (fewer changes)
-3. **Bowler chart**: Varied attacks preventing adaptation
-
-### Chasing Performance (Innings 2)
-Evaluate:
-1. How quickly chasing team reached target
-2. Whether any bowler was particularly expensive
-3. Pattern of wickets vs runs conceded
-
----
-
-## 📋 Chart Statistics Summary
-
-All charts automatically generated from live simulation data:
-- **Accuracy**: Delivery-by-delivery tracking
-- **Completeness**: All 40 overs (both innings) mapped
-- **Detail Level**: Includes legal balls AND extras
-- **Refresh**: Regenerated each simulation run
-
----
-
-## 🔗 Related Documentation
-
-- **Match Rules**: See C source files for detailed logic
-- **Simulation Code**: Check `main.c`, `match.c`, `threads.c`
-- **Scheduling Logic**: Review `threads.c` for batsman dispatch
-- **Scoring System**: Refer to ball outcome probability in `threads.c`
-
----
-
-## 📊 Quick Reference
-
-| File | Content | Updated |
-|------|---------|---------|
-| `striker_gantt.md` | Striker timeline | ✅ Auto-generated |
-| `non_striker_gantt.md` | Non-striker timeline | ✅ Auto-generated |
-| `bowler_gantt.md` | Bowler rotation | ✅ Auto-generated |
-
----
-
-**Generated by**: T20 Cricket Simulator v2.0  
-**Engine**: Multi-threaded C with OS scheduling concepts  
-**Simulation Date**: Real-time execution based on random seed  
-**Purpose**: Educational - Demonstrating thread coordination & scheduling algorithms in sports context
-
+**Related Charts:**
+- [Striker Timeline](striker_gantt.md) - Deliveries at striker end (facing bowler)
+- [Bowler Rotation](bowler_gantt.md) - Bowling sequence and overs allocation
