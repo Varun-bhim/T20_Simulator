@@ -40,6 +40,7 @@ extern int innings_total_deliveries[2];
 extern int toss_winner;
 extern int toss_choice;
 extern int batting_team;
+extern bool is_second_innings;
 
 extern int global_score;
 extern int total_balls_bowled; // The Cricket Clock (legal balls only)
