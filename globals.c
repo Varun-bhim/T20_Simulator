@@ -3,7 +3,7 @@
 BatterStat batter_stats[2][12] = {0}; 
 BowlerStat bowler_stats[2][6] = {0};  
 
-int system_ticks = 0; // Initialize the Absolute OS Clock
+int system_ticks = 0; 
 int arrival_time[2][12] = {0};
 int start_time[2][12] = {0};
 int end_time[2][12] = {0};
@@ -23,16 +23,15 @@ int target_score = -1;
 int team_scores[2] = {0};
 int team_wickets[2] = {0};
 int team_balls[2] = {0};
-int innings_total_deliveries[2] = {0};  // Track total deliveries per innings
+int innings_total_deliveries[2] = {0};  
 
-// Toss variables
 int toss_winner = -1;  // 0 = India, 1 = Pakistan
 int toss_choice = -1;  // 0 = Bat, 1 = Bowl
 int batting_team = 0;  // 0 = India bats first, 1 = Pakistan bats first
-bool is_second_innings = false;  // Track if we're in the chasing (second) innings
+bool is_second_innings = false;  
 int global_score = 0;
-int total_balls_bowled = 0;       // Only legal balls
-int total_deliveries = 0;         // All deliveries (legal + wides + no-balls)
+int total_balls_bowled = 0;       
+int total_deliveries = 0;         
 int wickets_fallen = 0;
 bool match_over = false;
 bool ball_ready = false; 
@@ -50,10 +49,9 @@ int active_bowler_id = 1;
 pthread_t batsmen[12]; 
 int bat_ids[12];
 
-// --- Tracking arrays for Gantt charts ---
-int striker_per_ball[2][361] = {0};      // Which batsman is at striker end per delivery
-int non_striker_per_ball[2][361] = {0};  // Which batsman is at non-striker end per delivery
-int bowler_per_ball[2][361] = {0};       // Which bowler bowls each delivery
+int striker_per_ball[2][361] = {0};      
+int non_striker_per_ball[2][361] = {0};  
+int bowler_per_ball[2][361] = {0};       
 
 pthread_mutex_t pitch_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t score_mutex = PTHREAD_MUTEX_INITIALIZER;
