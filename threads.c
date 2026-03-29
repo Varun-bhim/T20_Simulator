@@ -11,7 +11,7 @@ void* fielder_action(void* arg) {
             pthread_mutex_unlock(&pitch_mutex);
             break;
         }
-        printf("[Fielding] %s chases the ball down to the boundary!\n", get_fielder_name(current_innings, fielder_id));
+        printf("[Fielding] %s chases the ball down to the boundary!\n", get_fielder_name(innings_index, fielder_id));
         ball_in_air = false; 
         pthread_mutex_unlock(&pitch_mutex);
         usleep(15000); 
@@ -22,13 +22,14 @@ void* fielder_action(void* arg) {
 void* batsman_action(void* arg) {
     int bat_id = *((int*)arg);
     
-    arrival_time[current_innings][bat_id] = system_ticks;
+    // Arrival Time is tied to the absolute OS Clock
+    arrival_time[innings_index][bat_id] = system_ticks;
     sem_wait(&crease_sem);
-    start_time[current_innings][bat_id] = system_ticks;
-    wait_time[current_innings][bat_id] = start_time[current_innings][bat_id] - arrival_time[current_innings][bat_id];
+    start_time[innings_index][bat_id] = system_ticks;
+    wait_time[innings_index][bat_id] = start_time[innings_index][bat_id] - arrival_time[innings_index][bat_id];
 
-    batter_stats[current_innings][bat_id].has_batted = true;
-    printf("[Pavilion] %s walks out to the crease.\n", get_bat_name(current_innings, bat_id));
+    batter_stats[innings_index][bat_id].has_batted = true;
+    printf("[Pavilion] %s walks out to the crease.\n", get_bat_name(innings_index, bat_id));
 
     while (!match_over && wickets_fallen < 10) {
         pthread_mutex_lock(&pitch_mutex);
@@ -56,9 +57,9 @@ void* batsman_action(void* arg) {
             
             if (current_is_wide) {
                 global_score += 1;
-                bowler_stats[current_innings][active_bowler_id].runs_conceded += 1;
-                bowler_stats[current_innings][active_bowler_id].wides += 1; 
-                printf("[Umpire] WIDE bowled by %s! Score: %d/%d\n", get_bowl_name(current_innings, active_bowler_id), global_score, wickets_fallen);
+                bowler_stats[innings_index][active_bowler_id].runs_conceded += 1;
+                bowler_stats[innings_index][active_bowler_id].wides += 1; 
+                printf("[Umpire] WIDE bowled by %s! Score: %d/%d\n", get_bowl_name(innings_index, active_bowler_id), global_score, wickets_fallen);
                 check_target();
                 pthread_mutex_unlock(&score_mutex);
                 ball_ready = false; 
@@ -68,14 +69,14 @@ void* batsman_action(void* arg) {
                 continue; 
             } else if (current_is_no_ball) {
                 global_score += 1;
-                bowler_stats[current_innings][active_bowler_id].runs_conceded += 1;
-                bowler_stats[current_innings][active_bowler_id].no_balls += 1; 
-                printf("[Umpire] NO BALL from %s! FREE HIT next delivery for %s!\n", get_bowl_name(current_innings, active_bowler_id), get_bat_name(current_innings, bat_id));
+                bowler_stats[innings_index][active_bowler_id].runs_conceded += 1;
+                bowler_stats[innings_index][active_bowler_id].no_balls += 1; 
+                printf("[Umpire] NO BALL from %s! FREE HIT next delivery for %s!\n", get_bowl_name(innings_index, active_bowler_id), get_bat_name(innings_index, bat_id));
                 check_target();
             }
 
-            batter_stats[current_innings][bat_id].balls++;
-            if (!current_is_no_ball) bowler_stats[current_innings][active_bowler_id].balls_bowled++;
+            batter_stats[innings_index][bat_id].balls++;
+            if (!current_is_no_ball) bowler_stats[innings_index][active_bowler_id].balls_bowled++;
             pthread_mutex_unlock(&score_mutex);
 
             int shot_probability = rand() % 100;
@@ -102,7 +103,7 @@ void* batsman_action(void* arg) {
             }
 
             if (is_run_out) {
-                printf("\n[%s] taps it to point and calls for a quick single!\n", get_bat_name(current_innings, bat_id));
+                printf("\n[%s] taps it to point and calls for a quick single!\n", get_bat_name(innings_index, bat_id));
                 run_out_in_progress = true;
                 pthread_cond_broadcast(&ball_bowled_cond); 
                 pthread_mutex_unlock(&pitch_mutex); 
@@ -114,9 +115,9 @@ void* batsman_action(void* arg) {
                     pthread_mutex_lock(&pitch_mutex);
                     pthread_mutex_lock(&score_mutex);
                     
-                    printf(">>> [Deadlock] CIRCULAR WAIT! %s is RUN OUT by a direct hit! <<<\n", get_bat_name(current_innings, bat_id));
+                    printf(">>> [Deadlock] CIRCULAR WAIT! %s is RUN OUT by a direct hit! <<<\n", get_bat_name(innings_index, bat_id));
                     wickets_fallen++;
-                    batter_stats[current_innings][bat_id].is_out = true;
+                    batter_stats[innings_index][bat_id].is_out = true;
                     run_out_in_progress = false; 
                     
                     pthread_mutex_unlock(&crease_end_1); 
@@ -140,7 +141,7 @@ void* batsman_action(void* arg) {
                     pthread_mutex_unlock(&pitch_mutex);
                     sem_post(&crease_sem); 
                     
-                    end_time[current_innings][bat_id] = system_ticks; 
+                    end_time[innings_index][bat_id] = system_ticks; // Mark thread end time
                     pthread_exit(NULL); 
                 } else {
                     pthread_mutex_unlock(&crease_end_2);
@@ -155,13 +156,13 @@ void* batsman_action(void* arg) {
                 if (active_free_hit || current_is_no_ball) {
                     runs_scored = 0; 
                     is_wicket = false; 
-                    printf(">>> %s is Caught! BUT SURVIVES DUE TO FREE HIT! <<<\n", get_bat_name(current_innings, bat_id));
+                    printf(">>> %s is Caught! BUT SURVIVES DUE TO FREE HIT! <<<\n", get_bat_name(innings_index, bat_id));
                 } else {
                     pthread_mutex_lock(&score_mutex);
-                    printf(">>> WICKET! %s completely deceives %s! OUT! <<<\n", get_bowl_name(current_innings, active_bowler_id), get_bat_name(current_innings, bat_id));
+                    printf(">>> WICKET! %s completely deceives %s! OUT! <<<\n", get_bowl_name(innings_index, active_bowler_id), get_bat_name(innings_index, bat_id));
                     wickets_fallen++;
-                    batter_stats[current_innings][bat_id].is_out = true;
-                    bowler_stats[current_innings][active_bowler_id].wickets++;
+                    batter_stats[innings_index][bat_id].is_out = true;
+                    bowler_stats[innings_index][active_bowler_id].wickets++;
 
                     if (wickets_fallen == 10) {
                         match_over = true;
@@ -181,7 +182,7 @@ void* batsman_action(void* arg) {
                     pthread_mutex_unlock(&pitch_mutex);
                     sem_post(&crease_sem); 
                     
-                    end_time[current_innings][bat_id] = system_ticks; 
+                    end_time[innings_index][bat_id] = system_ticks; // Mark thread end time
                     pthread_exit(NULL); 
                 }
             }
@@ -189,16 +190,16 @@ void* batsman_action(void* arg) {
             if (!is_wicket && !is_run_out) {
                 pthread_mutex_lock(&score_mutex);
                 global_score += runs_scored;
-                batter_stats[current_innings][bat_id].runs += runs_scored;
-                bowler_stats[current_innings][active_bowler_id].runs_conceded += runs_scored;
+                batter_stats[innings_index][bat_id].runs += runs_scored;
+                bowler_stats[innings_index][active_bowler_id].runs_conceded += runs_scored;
 
-                if (runs_scored == 4) batter_stats[current_innings][bat_id].fours++;
-                if (runs_scored == 6) batter_stats[current_innings][bat_id].sixes++;
+                if (runs_scored == 4) batter_stats[innings_index][bat_id].fours++;
+                if (runs_scored == 6) batter_stats[innings_index][bat_id].sixes++;
 
-                if (runs_scored == 0) printf("[%s] defends the delivery from %s. Dot ball.\n", get_bat_name(current_innings, bat_id), get_bowl_name(current_innings, active_bowler_id));
-                else if (runs_scored == 4) printf("[%s] smashes %s for a BOUNDARY FOUR! Score: %d/%d\n", get_bat_name(current_innings, bat_id), get_bowl_name(current_innings, active_bowler_id), global_score, wickets_fallen);
-                else if (runs_scored == 6) printf("[%s] hits %s for a MASSIVE SIX! Score: %d/%d\n", get_bat_name(current_innings, bat_id), get_bowl_name(current_innings, active_bowler_id), global_score, wickets_fallen);
-                else printf("[%s] pushes into the gap for %d runs. Score: %d/%d\n", get_bat_name(current_innings, bat_id), runs_scored, global_score, wickets_fallen);
+                if (runs_scored == 0) printf("[%s] defends the delivery from %s. Dot ball.\n", get_bat_name(innings_index, bat_id), get_bowl_name(innings_index, active_bowler_id));
+                else if (runs_scored == 4) printf("[%s] smashes %s for a BOUNDARY FOUR! Score: %d/%d\n", get_bat_name(innings_index, bat_id), get_bowl_name(innings_index, active_bowler_id), global_score, wickets_fallen);
+                else if (runs_scored == 6) printf("[%s] hits %s for a MASSIVE SIX! Score: %d/%d\n", get_bat_name(innings_index, bat_id), get_bowl_name(innings_index, active_bowler_id), global_score, wickets_fallen);
+                else printf("[%s] pushes into the gap for %d runs. Score: %d/%d\n", get_bat_name(innings_index, bat_id), runs_scored, global_score, wickets_fallen);
 
                 if (runs_scored >= 4) {
                     ball_in_air = true;
@@ -223,7 +224,8 @@ void* batsman_action(void* arg) {
         usleep(5000); 
     }
     
-    end_time[current_innings][bat_id] = system_ticks;
+    // For non-out batsmen when innings ends
+    end_time[innings_index][bat_id] = system_ticks;
     sem_post(&crease_sem);
     return NULL;
 }
@@ -235,8 +237,10 @@ void* bowler_action(void* arg) {
     while (balls_this_spell < 6 && total_balls_bowled < 120 && wickets_fallen < 10 && !match_over) {
         pthread_mutex_lock(&pitch_mutex);
         
+        // --- NEW: THE ABSOLUTE OS SYSTEM CLOCK TICKS FORWARD ---
         system_ticks++; 
         
+        // Increment total deliveries for this delivery (legal or not)
         total_deliveries++;
         
         int extra_prob = rand() % 100;
@@ -245,18 +249,20 @@ void* bowler_action(void* arg) {
 
         active_bowler_id = bowler_id; 
         
-        striker_per_ball[current_innings][total_deliveries] = striker_id;
-        non_striker_per_ball[current_innings][total_deliveries] = non_striker_id;
-        bowler_per_ball[current_innings][total_deliveries] = bowler_id;
+        // Record striker, non-striker, and bowler for THIS delivery (all deliveries count)
+        striker_per_ball[innings_index][total_deliveries] = striker_id;
+        non_striker_per_ball[innings_index][total_deliveries] = non_striker_id;
+        bowler_per_ball[innings_index][total_deliveries] = bowler_id;
 
         if (current_is_wide) {
-            printf("\n[%s] runs in... slips out of the hand! WIDE.\n", get_bowl_name(current_innings, bowler_id));
+            printf("\n[%s] runs in... slips out of the hand! WIDE.\n", get_bowl_name(innings_index, bowler_id));
         } else if (current_is_no_ball) {
-            printf("\n[%s] oversteps the crease! NO BALL!\n", get_bowl_name(current_innings, bowler_id));
+            printf("\n[%s] oversteps the crease! NO BALL!\n", get_bowl_name(innings_index, bowler_id));
         } else {
+            // THE CRICKET CLOCK ONLY TICKS ON LEGAL BALLS
             total_balls_bowled++;
             balls_this_spell++;
-            printf("\n[%s] bowls ball %d of the innings to %s %s...\n", get_bowl_name(current_innings, bowler_id), total_balls_bowled, get_bat_name(current_innings, striker_id), active_free_hit ? "(FREE HIT)" : "");
+            printf("\n[%s] bowls ball %d of the innings to %s %s...\n", get_bowl_name(innings_index, bowler_id), total_balls_bowled, get_bat_name(innings_index, striker_id), active_free_hit ? "(FREE HIT)" : "");
         }
         
         ball_ready = true; 
@@ -268,7 +274,7 @@ void* bowler_action(void* arg) {
         
         if (balls_this_spell == 6 && !match_over && !current_is_wide && !current_is_no_ball) {
             int temp = striker_id; striker_id = non_striker_id; non_striker_id = temp;
-            printf("\n--- End of Over %d. %s finishes his spell. ---\n\n", total_balls_bowled / 6, get_bowl_name(current_innings, bowler_id));
+            printf("\n--- End of Over %d. %s finishes his spell. ---\n\n", total_balls_bowled / 6, get_bowl_name(innings_index, bowler_id));
         }
 
         pthread_mutex_unlock(&pitch_mutex);
