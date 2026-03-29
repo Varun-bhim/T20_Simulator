@@ -4,7 +4,7 @@ gantt
     dateFormat X
     axisFormat %d
 
-    section Innings 1 (India Bowlers)
+    section Innings 1 
     M. Asif : 1, 6
     S. Tanvir : 7, 7
     Umar Gul : 14, 6
@@ -26,7 +26,7 @@ gantt
     S. Afridi : 116, 7
     Y. Arafat : 123, 8
     
-    section Innings 2 (Pakistan Bowlers)
+    section Innings 2 
     RP Singh : 1, 8
     Sreesanth : 9, 7
     Irfan Pathan : 16, 7
