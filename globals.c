@@ -3,7 +3,7 @@
 BatterStat batter_stats[2][12] = {0}; 
 BowlerStat bowler_stats[2][6] = {0};  
 
-int system_ticks = 0; // Initialize the Absolute OS Clock
+int system_ticks = 0; 
 int arrival_time[2][12] = {0};
 int start_time[2][12] = {0};
 int end_time[2][12] = {0};
