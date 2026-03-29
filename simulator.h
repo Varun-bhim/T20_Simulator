@@ -19,30 +19,28 @@ typedef struct {
 
 extern BatterStat batter_stats[2][12];
 extern BowlerStat bowler_stats[2][6];  
-
-extern int system_ticks; 
+extern int system_ticks; // The Absolute OS Clock
 extern int arrival_time[2][12];
 extern int start_time[2][12];
 extern int wait_time[2][12];
-extern int end_time[2][12]; 
+extern int end_time[2][12]; // Tracks when thread exits
 extern bool use_sjf_scheduling; 
 extern int spawn_order[12];
-
-extern int current_innings;
+extern int innings_index;
+extern int batting_team_per_innings[2];
 extern int target_score;   
 extern int team_scores[2];
 extern int team_wickets[2];
 extern int team_balls[2];
 extern int innings_total_deliveries[2];
-
 extern int toss_winner;
 extern int toss_choice;
 extern int batting_team;
 extern bool is_second_innings;
 
 extern int global_score;
-extern int total_balls_bowled; 
-extern int total_deliveries;   
+extern int total_balls_bowled; // The Cricket Clock (legal balls only)
+extern int total_deliveries;   // All deliveries including wides and no-balls
 extern int wickets_fallen;
 extern bool match_over;
 extern bool ball_ready; 
@@ -60,6 +58,7 @@ extern int active_bowler_id;
 extern pthread_t batsmen[12]; 
 extern int bat_ids[12];
 
+// --- Tracking arrays for Gantt charts ---
 extern int striker_per_ball[2][361];
 extern int non_striker_per_ball[2][361];
 extern int bowler_per_ball[2][361];
