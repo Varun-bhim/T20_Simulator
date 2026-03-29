@@ -22,7 +22,6 @@ void* fielder_action(void* arg) {
 void* batsman_action(void* arg) {
     int bat_id = *((int*)arg);
     
-    // Arrival Time is tied to the absolute OS Clock
     arrival_time[current_innings][bat_id] = system_ticks;
     sem_wait(&crease_sem);
     start_time[current_innings][bat_id] = system_ticks;
@@ -141,7 +140,7 @@ void* batsman_action(void* arg) {
                     pthread_mutex_unlock(&pitch_mutex);
                     sem_post(&crease_sem); 
                     
-                    end_time[current_innings][bat_id] = system_ticks; // Mark thread end time
+                    end_time[current_innings][bat_id] = system_ticks; 
                     pthread_exit(NULL); 
                 } else {
                     pthread_mutex_unlock(&crease_end_2);
@@ -182,7 +181,7 @@ void* batsman_action(void* arg) {
                     pthread_mutex_unlock(&pitch_mutex);
                     sem_post(&crease_sem); 
                     
-                    end_time[current_innings][bat_id] = system_ticks; // Mark thread end time
+                    end_time[current_innings][bat_id] = system_ticks; 
                     pthread_exit(NULL); 
                 }
             }
@@ -224,7 +223,6 @@ void* batsman_action(void* arg) {
         usleep(5000); 
     }
     
-    // For non-out batsmen when innings ends
     end_time[current_innings][bat_id] = system_ticks;
     sem_post(&crease_sem);
     return NULL;
@@ -237,10 +235,8 @@ void* bowler_action(void* arg) {
     while (balls_this_spell < 6 && total_balls_bowled < 120 && wickets_fallen < 10 && !match_over) {
         pthread_mutex_lock(&pitch_mutex);
         
-        // --- NEW: THE ABSOLUTE OS SYSTEM CLOCK TICKS FORWARD ---
         system_ticks++; 
         
-        // Increment total deliveries for this delivery (legal or not)
         total_deliveries++;
         
         int extra_prob = rand() % 100;
@@ -249,7 +245,6 @@ void* bowler_action(void* arg) {
 
         active_bowler_id = bowler_id; 
         
-        // Record striker, non-striker, and bowler for THIS delivery (all deliveries count)
         striker_per_ball[current_innings][total_deliveries] = striker_id;
         non_striker_per_ball[current_innings][total_deliveries] = non_striker_id;
         bowler_per_ball[current_innings][total_deliveries] = bowler_id;
@@ -259,7 +254,6 @@ void* bowler_action(void* arg) {
         } else if (current_is_no_ball) {
             printf("\n[%s] oversteps the crease! NO BALL!\n", get_bowl_name(current_innings, bowler_id));
         } else {
-            // THE CRICKET CLOCK ONLY TICKS ON LEGAL BALLS
             total_balls_bowled++;
             balls_this_spell++;
             printf("\n[%s] bowls ball %d of the innings to %s %s...\n", get_bowl_name(current_innings, bowler_id), total_balls_bowled, get_bat_name(current_innings, striker_id), active_free_hit ? "(FREE HIT)" : "");
