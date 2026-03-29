@@ -1,5 +1,6 @@
 #include "simulator.h"
 
+// 1. Check Target Function
 int death_over_specialist_candidates[4] = {11, 10, 9, 8}; // tail-enders / specialists for last over
 
 void perform_toss() {
@@ -15,13 +16,14 @@ void perform_toss() {
     printf("%s WON THE TOSS AND ELECTED TO %s FIRST\n", teams[toss_winner], choices[toss_choice]);
     printf("================================================================================\n\n");
     
-    if (toss_choice == 0) {  
+    // Determine who bats first
+    if (toss_choice == 0) {  // Toss winner chose to bat
         batting_team = toss_winner;
-    } else {  
+    } else {  // Toss winner chose to bowl
         batting_team = 1 - toss_winner;
     }
     
-    usleep(1000000);  // There is no as such technical significance of this statement; introduced just for a pause 
+    usleep(1000000);  // Brief pause for drama
 }
 
 int pick_next_batsman() {
@@ -30,8 +32,8 @@ int pick_next_batsman() {
     if ((120 - total_balls_bowled) <= 6) {
         for (int i = 0; i < 4; i++) {
             int specialist = death_over_specialist_candidates[i];
-            if (!batter_stats[current_innings][specialist].has_batted && specialist != striker_id && specialist != non_striker_id) {
-                printf("[Scheduler] DEATH OVER priority: selecting specialist %s\n", get_bat_name(current_innings, specialist));
+            if (!batter_stats[innings_index][specialist].has_batted && specialist != striker_id && specialist != non_striker_id) {
+                printf("[Scheduler] DEATH OVER priority: selecting specialist %s\n", get_bat_name(innings_index, specialist));
                 return specialist;
             }
         }
@@ -40,7 +42,7 @@ int pick_next_batsman() {
     while (next_batsman_id <= 11) {
         int candidate = spawn_order[next_batsman_id];
         next_batsman_id++;
-        if (candidate >= 1 && candidate <= 11 && !batter_stats[current_innings][candidate].has_batted) {
+        if (candidate >= 1 && candidate <= 11 && !batter_stats[innings_index][candidate].has_batted) {
             return candidate;
         }
     }
@@ -48,8 +50,9 @@ int pick_next_batsman() {
 }
 
 void check_target() {
+    // Only check target in second innings (chasing team) and only if target_score is valid
     if (is_second_innings && target_score > 0 && global_score >= target_score) {
-        printf("\n>>> TARGET CHASED DOWN! %s WINS! <<<\n", (current_innings == 0) ? "INDIA" : "PAKISTAN");
+        printf("\n>>> TARGET CHASED DOWN! %s WINS! <<<\n", (batting_team_per_innings[innings_index] == 0) ? "INDIA" : "PAKISTAN");
         match_over = true;
         pthread_cond_broadcast(&next_ball_cond);
         pthread_cond_broadcast(&ball_bowled_cond);
@@ -57,11 +60,12 @@ void check_target() {
     }
 }
 
+// 2. Reset State Function (With OS Clock Reset)
 void reset_innings_state() {
     global_score = 0;
     total_balls_bowled = 0;
-    total_deliveries = 0;  
-    system_ticks = 0; 
+    total_deliveries = 0;  // Reset all deliveries counter
+    system_ticks = 0; // OS Clock reset
     wickets_fallen = 0;
     match_over = false;
     ball_ready = false; 
@@ -73,10 +77,11 @@ void reset_innings_state() {
 
     striker_id = 1;
     non_striker_id = 2;
-    next_batsman_id = 3;  
+    next_batsman_id = 3;  // RESET THIS - was missing!
     active_bowler_id = 1;
 }
 
+// 3. Play Innings Function
 void play_innings() {
     sem_init(&crease_sem, 0, 2); 
     
@@ -119,12 +124,13 @@ void play_innings() {
 
     for (int i = 0; i < 10; i++) pthread_join(fielders[i], NULL);
     for (int i = 1; i <= 11; i++) {
-        if (batter_stats[current_innings][i].has_batted) pthread_join(batsmen[i], NULL);
+        if (batter_stats[innings_index][i].has_batted) pthread_join(batsmen[i], NULL);
     }
 
     sem_destroy(&crease_sem);
 }
 
+// 4. Print Team Innings Function
 void print_team_innings(int inn_idx, const char* bat_team, const char* bowl_team) {
     int total_wides = 0; int total_no_balls = 0;
     for (int i = 1; i <= 5; i++) {
@@ -155,6 +161,7 @@ void print_team_innings(int inn_idx, const char* bat_team, const char* bowl_team
     printf("================================================================================\n");
 }
 
+// 5. Generate Gantt Chart Function (With OS Clock Fix)
 void generate_gantt_chart() {
     FILE *fp = fopen("gantt.md", "w");
     if (fp == NULL) return;
@@ -190,6 +197,7 @@ void generate_gantt_chart() {
     printf("\n>>> DELIVERABLE 2: Gantt chart perfectly generated in 'gantt.md' <<<\n");
 }
 
+// 6. Generate Striker Gantt Chart Function
 void generate_striker_gantt_chart() {
     FILE *fp = fopen("striker_gantt.md", "w");
     if (fp == NULL) return;
@@ -200,9 +208,9 @@ void generate_striker_gantt_chart() {
     fprintf(fp, "    dateFormat X\n");
     fprintf(fp, "    axisFormat %%d\n\n");
 
-    fprintf(fp, "    section Innings 1 (India)\n");
     for (int inn = 0; inn < 2; inn++) {
-        if (inn == 1) fprintf(fp, "    section Innings 2 (Pakistan)\n");
+        const char* team_name = (batting_team_per_innings[inn] == 0) ? "India" : "Pakistan";
+        fprintf(fp, "    section Innings %d (%s)\n", inn+1, team_name);
         
         int max_deliveries = innings_total_deliveries[inn];
         int current_striker = -1;
@@ -213,6 +221,7 @@ void generate_striker_gantt_chart() {
             
             if (striker != current_striker) {
                 if (current_striker != -1) {
+                    // Output the previous range
                     int end_delivery = delivery - 1;
                     fprintf(fp, "    %s : %d, %d\n", get_bat_name(inn, current_striker), start_delivery, end_delivery - start_delivery + 1);
                 }
@@ -221,6 +230,7 @@ void generate_striker_gantt_chart() {
             }
         }
         
+        // Output the last range
         if (current_striker != -1) {
             fprintf(fp, "    %s : %d, %d\n", get_bat_name(inn, current_striker), start_delivery, max_deliveries - start_delivery + 1);
         }
@@ -231,6 +241,7 @@ void generate_striker_gantt_chart() {
     printf("\n>>> Striker Gantt chart generated in 'striker_gantt.md' <<<\n");
 }
 
+// 7. Generate Non-Striker Gantt Chart Function
 void generate_non_striker_gantt_chart() {
     FILE *fp = fopen("non_striker_gantt.md", "w");
     if (fp == NULL) return;
@@ -241,9 +252,9 @@ void generate_non_striker_gantt_chart() {
     fprintf(fp, "    dateFormat X\n");
     fprintf(fp, "    axisFormat %%d\n\n");
 
-    fprintf(fp, "    section Innings 1 (India)\n");
     for (int inn = 0; inn < 2; inn++) {
-        if (inn == 1) fprintf(fp, "    section Innings 2 (Pakistan)\n");
+        const char* team_name = (batting_team_per_innings[inn] == 0) ? "India" : "Pakistan";
+        fprintf(fp, "    section Innings %d (%s)\n", inn+1, team_name);
         
         int max_deliveries = innings_total_deliveries[inn];
         int current_non_striker = -1;
@@ -254,6 +265,7 @@ void generate_non_striker_gantt_chart() {
             
             if (non_striker != current_non_striker) {
                 if (current_non_striker != -1) {
+                    // Output the previous range
                     int end_delivery = delivery - 1;
                     fprintf(fp, "    %s : %d, %d\n", get_bat_name(inn, current_non_striker), start_delivery, end_delivery - start_delivery + 1);
                 }
@@ -262,6 +274,7 @@ void generate_non_striker_gantt_chart() {
             }
         }
         
+        // Output the last range
         if (current_non_striker != -1) {
             fprintf(fp, "    %s : %d, %d\n", get_bat_name(inn, current_non_striker), start_delivery, max_deliveries - start_delivery + 1);
         }
@@ -272,6 +285,7 @@ void generate_non_striker_gantt_chart() {
     printf("\n>>> Non-Striker Gantt chart generated in 'non_striker_gantt.md' <<<\n");
 }
 
+// 8. Generate Bowler Gantt Chart Function
 void generate_bowler_gantt_chart() {
     FILE *fp = fopen("bowler_gantt.md", "w");
     if (fp == NULL) return;
@@ -282,9 +296,9 @@ void generate_bowler_gantt_chart() {
     fprintf(fp, "    dateFormat X\n");
     fprintf(fp, "    axisFormat %%d\n\n");
 
-    fprintf(fp, "    section Innings 1 \n");
     for (int inn = 0; inn < 2; inn++) {
-        if (inn == 1) fprintf(fp, "    section Innings 2 \n");
+        const char* bowl_team_name = (batting_team_per_innings[inn] == 0) ? "Pakistan" : "India";
+        fprintf(fp, "    section Innings %d (%s Bowlers)\n", inn+1, bowl_team_name);
         
         int max_deliveries = innings_total_deliveries[inn];
         int current_bowler = -1;
@@ -295,6 +309,7 @@ void generate_bowler_gantt_chart() {
             
             if (bowler != current_bowler) {
                 if (current_bowler != -1) {
+                    // Output the previous range
                     int end_delivery = delivery - 1;
                     fprintf(fp, "    %s : %d, %d\n", get_bowl_name(inn, current_bowler), start_delivery, end_delivery - start_delivery + 1);
                 }
@@ -303,6 +318,7 @@ void generate_bowler_gantt_chart() {
             }
         }
         
+        // Output the last range
         if (current_bowler != -1) {
             fprintf(fp, "    %s : %d, %d\n", get_bowl_name(inn, current_bowler), start_delivery, max_deliveries - start_delivery + 1);
         }
@@ -313,6 +329,7 @@ void generate_bowler_gantt_chart() {
     printf("\n>>> Bowler Gantt chart generated in 'bowler_gantt.md' <<<\n");
 }
 
+// 9. Print Wait Time Analysis Function
 void print_wait_time_analysis() {
     printf("\n################################################################################\n");
     printf("         DELIVERABLE 3: SCHEDULING ANALYSIS (FCFS vs. SJF)                      \n");
