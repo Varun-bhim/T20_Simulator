@@ -3,7 +3,7 @@
 BatterStat batter_stats[2][12] = {0}; 
 BowlerStat bowler_stats[2][6] = {0};  
 
-int system_ticks = 0; 
+int system_ticks = 0; // Initialize the Absolute OS Clock
 int arrival_time[2][12] = {0};
 int start_time[2][12] = {0};
 int end_time[2][12] = {0};
@@ -17,12 +17,13 @@ const char *pak_squad[11] = {"M. Hafeez", "I. Nazir", "K. Akmal", "Younis Khan",
 const char *ind_bowlers[5] = {"RP Singh", "Sreesanth", "Irfan Pathan", "Harbhajan", "Joginder S."};
 const char *pak_bowlers[5] = {"M. Asif", "S. Tanvir", "Umar Gul", "S. Afridi", "Y. Arafat"};
 
-int current_innings = 0; 
+int innings_index = 0; 
+int batting_team_per_innings[2] = {0}; 
 int target_score = -1;   
 int team_scores[2] = {0};
 int team_wickets[2] = {0};
 int team_balls[2] = {0};
-int innings_total_deliveries[2] = {0};  
+int innings_total_deliveries[2] = {0};  // Track total deliveries per innings
 
 // Toss variables
 int toss_winner = -1;  // 0 = India, 1 = Pakistan
@@ -66,11 +67,11 @@ pthread_mutex_t crease_end_2 = PTHREAD_MUTEX_INITIALIZER;
 bool run_out_in_progress = false;
 
 const char* get_bat_name(int innings, int id) {
-    return (innings == 0) ? ind_squad[id-1] : pak_squad[id-1];
+    return (batting_team_per_innings[innings] == 0) ? ind_squad[id-1] : pak_squad[id-1];
 }
 const char* get_bowl_name(int innings, int id) {
-    return (innings == 0) ? pak_bowlers[id-1] : ind_bowlers[id-1];
+    return (batting_team_per_innings[innings] == 0) ? pak_bowlers[id-1] : ind_bowlers[id-1];
 }
 const char* get_fielder_name(int innings, int id) {
-    return (innings == 0) ? pak_squad[id-1] : ind_squad[id-1];
+    return (batting_team_per_innings[innings] == 0) ? pak_squad[id-1] : ind_squad[id-1];
 }
